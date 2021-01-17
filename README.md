@@ -3,3 +3,4 @@
 The project is smart screen advertisements board,
 The screens are neighborhood screens, and show local advertisements.
 
+![GitHub Logo](/images/logo.png)
