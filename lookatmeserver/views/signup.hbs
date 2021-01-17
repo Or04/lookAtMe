@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #sign-up-form-box {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+            margin: 0 auto;
+            direction: rtl;
+        }
+
+        #email-input, #password-input, #verification-password-input, #phone-number-input {
+            direction: ltr;
+        }
+
+        .valid {
+            border: 2px solid green;
+        }
+
+        .not-valid {
+            border: 2px solid red;
+        }
+
+        #select-digital-board-box {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0;
+            padding: 0 10px;
+        }
+
+        #select-digital-board-box select {
+            margin: 10px 0;
+        }
+
+        #error-box {
+            text-align: center;
+            margin-bottom: 20px;
+            color: red;
+        }
+
+        #loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 3vw;
+            height: 3vw;
+            animation: spin 2s linear infinite;
+        }
+
+        #submit-sign-up {
+            display: flex;
+            flex-direction: row;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.0.0/validator.min.js"
+            integrity="sha256-gyO4new2/pN9zvXDLCWLyO7siPKq5pSJ7wL8UzDMmpI=" crossorigin="anonymous"></script>
+    <script>
+        const handleSelectCity = async () => {
+            let selectElement = document.getElementById('cities')
+            let selectedOption = selectElement.options[selectElement.selectedIndex]
+            if (selectedOption.value != -1) {
+                try {
+                    let url = 'http://lookatmeil.com/getalldigitalboards'
+                    let data = {
+                        cityId: selectedOption.value
+                    }
+                    let options = {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data),
+                        method: 'POST'
+                    }
+                    let fetchResponed = await fetch(url, options)
+                    fetchResponed = await fetchResponed.json()
+
+
+    
+                    fetchResponed.value.forEach(item => {
+                        let optionElement = document.createElement("OPTION")
+                        optionElement.setAttribute('value', item.id)
+
+                        optionElement.innerHTML = item.address.toString()
+                        document.getElementById('address').appendChild(optionElement)
+                    })
+                } catch (error) {
+                    document.getElementById('error-box').innerHTML = error.toString()
+                }
+            } else {
+
+            }
+
+
+
+        }
+        const loadCities = async () => {
+            try {
+                let url = 'http://lookatmeil.com/getAllCities'
+                let fetchResponed = await fetch(url)
+                fetchResponed = await fetchResponed.json()
+                /*
+                <option  point={ id: item.id, city: item.city, latitude: item.latitude, longitude: item.longitude } value={item.id}>{item.city}</option>
+    */
+                fetchResponed.value.forEach(item => {
+                    let optionElement = document.createElement("OPTION")
+                    optionElement.setAttribute('value', item.id)
+                    optionElement.setAttribute('point', {
+                        id: item.id,
+                        city: item.city,
+                        latitude: item.latitude,
+                        longitude: item.longitude
+                    })
+                    optionElement.innerHTML = item.city.toString()
+                    document.getElementById('cities').appendChild(optionElement)
+                })
+            } catch (error) {
+                document.getElementById('error-box').innerHTML = error.toString()
+            }
+
+        }
+
+
+        window.onload = () => {
+            let adId = document.getElementById('advertisement-id').value
+            let email = document.getElementById('email').value
+            loadCities()
+            document.getElementById('email-input').setAttribute('value', email)
+            document.getElementById('loader').style.display = 'none'
+        }
+
+        const setUpValid = (bool, elem) => {
+            if (bool) {
+                elem.classList.remove('not-valid')
+                elem.classList.add('valid')
+                return true
+            } else {
+                elem.classList.remove('valid')
+                elem.classList.add('not-valid')
+                return false
+            }
+        }
+        const handleSignUpSubmit = async () => {
+            let validationFlag = true
+
+            let emailInput = document.getElementById('email-input')
+            let firstNameInput = document.getElementById('first-name-input')
+            let lastNameInput = document.getElementById('last-name-input')
+            let passwordInput = document.getElementById('password-input')
+            let verificationPasswordInput = document.getElementById('verification-password-input')
+
+
+            let selectCity = document.getElementById('cities')
+            let selectCityOption = selectCity.options[selectCity.selectedIndex]
+            let selectAddress = document.getElementById('address')
+            let selectAddressOption = selectAddress.options[selectAddress.selectedIndex]
+
+
+            setUpValid(validator.isEmail(emailInput.value), emailInput)
+            setUpValid(firstNameInput.value.length > 0, firstNameInput)
+            setUpValid(lastNameInput.value.length > 0, lastNameInput)
+            setUpValid(passwordInput.value.length > 0, passwordInput)
+            setUpValid(((verificationPasswordInput.value == passwordInput.value) && (verificationPasswordInput.value.length > 0)), verificationPasswordInput)
+
+            setUpValid(selectCityOption.value != -1, selectCity)
+            setUpValid(selectAddressOption.value != -1, selectAddress)
+
+            if (
+                    setUpValid(validator.isEmail(emailInput.value), emailInput) &&
+                    setUpValid(firstNameInput.value.length > 0, firstNameInput) &&
+                    setUpValid(lastNameInput.value.length > 0, lastNameInput) &&
+                    setUpValid(passwordInput.value.length > 0, passwordInput) &&
+                    setUpValid(((verificationPasswordInput.value == passwordInput.value) && (verificationPasswordInput.value.length > 0)), verificationPasswordInput) &&
+                    setUpValid(selectCityOption.value != -1, selectCity) &&
+                    setUpValid(selectAddressOption.value != -1, selectAddress)
+            ) {
+                try {
+                    document.getElementById('loader').style.display = 'block'
+                    let url = 'http://lookatmeil.com/userregistration'
+                    let data = {
+                        email: emailInput.value,
+                        firstName: firstNameInput.value,
+                        lastName: lastNameInput.value,
+                        password: passwordInput.value,
+                        digitalBoardId: selectAddressOption.value
+                    }
+                    let options = {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data),
+                        method: 'POST'
+                    }
+                    let fetchResponed = await fetch(url, options)
+                    // console.log(fetchResponed)
+                    if (fetchResponed.status != 200) {
+                        fetchResponed = await fetchResponed.json()
+                        throw fetchResponed.value
+                    }
+                    // console.log(fetchResponed)
+
+                    url = 'http://lookatmeil.com/addadvertisementforconsumer'
+                    data = {
+                        email: emailInput.value,
+                        advertisementsId: selectAddressOption.value
+                    }
+                    options = {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data),
+                        method: 'POST'
+                    }
+                    fetchResponed = await fetch(url, options)
+                    if (fetchResponed.status != 200) {
+                        fetchResponed = await fetchResponed.json()
+                        throw fetchResponed.value
+                    }
+                    document.getElementById('loader').style.display = 'none'
+                } catch (error) {
+                    document.getElementById('error-box').innerHTML = error.toString()
+                    document.getElementById('loader').style.display = 'none'
+                }
+            }
+
+        }
+    </script>
+</head>
+<body>
+
+<input type="hidden" id="advertisement-id" value={{advertisementId}}>
+<input type="hidden" id="email" value={{email}}>
+
+<section>
+    <section id='error-box'>
+
+    </section>
+    <section id='sign-up-form-box'>
+
+        <label>הכנס מייל</label>
+        <input type='email' id='email-input'/>
+
+        <label>שם פרטי</label>
+        <input type='text' id='first-name-input'/>
+
+        <label>שם משפחה</label>
+        <input type='text' id='last-name-input'/>
+
+        <label>סיסמא</label>
+        <input type='password' id='password-input'/>
+
+        <label>אימות סיסמא</label>
+        <input type='password' id='verification-password-input'/>
+
+        <section id='select-digital-board-box'>
+            <p>בחר לוח דיגיטלי קרוב למגוריך</p>
+            <select className='select-css' name="cities" id="cities" onChange="handleSelectCity()">
+                <option value='-1'>בחר עיר</option>
+            </select>
+
+            <select className='select-css' name="address" id="address">
+                <option value='-1'>בחר לוח דיגיטלי</option>
+            </select>
+
+        </section>
+
+        <section id='submit-sign-up'>
+            <button onclick="handleSignUpSubmit()">הירשם</button>
+            <div id="loader"></div>
+        </section>
+
+    </section>
+
+</section>
+
+</body>
+</html>
