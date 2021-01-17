@@ -54,13 +54,13 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBc9p4FIfwn9QPHwbFBiELwv4tt7xouroA"
+          "apiKey": "?????"
         }
       }
     },
     "ios": {
       "config": {
-        "googleMapsApiKey": "AIzaSyBc9p4FIfwn9QPHwbFBiELwv4tt7xouroA"
+        "googleMapsApiKey": "????"
       },
       "buildNumber": "1.0.1",
       "bundleIdentifier": "com.lookatmeil",
