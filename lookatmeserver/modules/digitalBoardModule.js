@@ -64,7 +64,7 @@ class DigitalBoard {
             await this.connectSql();
             let sqlQuery = await this.sqlQuery(`SELECT * FROM cities WHERE cities.id=${cityId}`)
             if (sqlQuery.length > 0) {
-                let addressResponed=await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.latitude},${point.longitude}&language=iw&key=AIzaSyBc9p4FIfwn9QPHwbFBiELwv4tt7xouroA`)
+                let addressResponed=await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.latitude},${point.longitude}&language=iw&key=????`)
                 addressResponed=await addressResponed.json()
 
                 let sqlQuery = await this.sqlQuery(`insert into digitalBoards(cityId, location,address) VALUES ((select cities.id from cities where cities.id=${cityId}),POINT(${point.latitude},${point.longitude}),'${addressResponed.results[0].formatted_address}')`)
