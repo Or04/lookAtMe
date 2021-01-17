@@ -1,6 +1,6 @@
 # look at me is bsc final project
 
-The project is smart screen advertisements board,
-The screens are neighborhood screens, and show local advertisements.
+The project is smart screen advertisement system,
+The ads are displayed on neighborhood screen,and show local advertisements.
 
 ![GitHub Logo](/lookatme.png)
